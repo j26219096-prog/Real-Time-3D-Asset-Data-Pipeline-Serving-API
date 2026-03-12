@@ -383,7 +383,7 @@ document.getElementById("btn").onclick = async () => {
 
   try {
     // Step 1: Ask backend what model matches
-    const res = await fetch(`http://127.0.0.1:8000/generate?prompt=${encodeURIComponent(promptText)}`);
+    const res = await fetch(`https://real-time-3d-asset-data-pipeline-serving.onrender.com/generate?prompt=${encodeURIComponent(promptText)}`);
     const data = await res.json();
 
     removeLastBot();
@@ -399,7 +399,7 @@ document.getElementById("btn").onclick = async () => {
       }
 
       const loader = new THREE.GLTFLoader();
-      const modelUrl = `http://127.0.0.1:8000/model/${data.model}`;
+      const modelUrl = `https://real-time-3d-asset-data-pipeline-serving.onrender.com/model/${data.model}`;
 
       loader.load(
         modelUrl,
