@@ -1,90 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Text to 3D Chatbot</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to 3D Chatbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background: #0f0f0f;
-    font-family: Arial, sans-serif;
-  }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  #chat {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    width: 300px;
-    height: 90%;
-    background: #111;
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-  }
+    body {
+      overflow: hidden;
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #dce8f5 0%, #e8f4ec 50%, #f5e8dc 100%);
+    }
 
-  #messages {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 10px;
-  }
+    /* ===== SIDEBAR CHAT PANEL ===== */
+    #chat {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 320px;
+      height: calc(100vh - 32px);
+      background: rgba(15, 15, 25, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 16px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+    }
 
-  .msg {
-    margin: 8px 0;
-    padding: 8px 10px;
-    border-radius: 8px;
-    max-width: 90%;
-    font-size: 14px;
-  }
+    /* ===== HEADER ===== */
+    #chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 12px;
+    }
 
-  .user {
-    background: #00ffcc;
-    color: black;
-    align-self: flex-end;
-  }
+    #chat-header .logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #6c63ff, #48cfad);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
 
-  .bot {
-    background: #333;
-    align-self: flex-start;
-  }
+    #chat-header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
 
-  #inputBox {
-    display: flex;
-  }
+    #chat-header p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 2px;
+    }
 
-  #prompt {
-    flex: 1;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-  }
+    /* ===== MESSAGES ===== */
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-  #btn {
-    margin-left: 6px;
-    padding: 8px 12px;
-    background: #00ffcc;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-</style>
+    #messages::-webkit-scrollbar {
+      width: 4px;
+    }
+    #messages::-webkit-scrollbar-track { background: transparent; }
+    #messages::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+
+    .msg {
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 92%;
+      white-space: pre-wrap;
+      animation: fadeSlide 0.25s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .user {
+      background: linear-gradient(135deg, #6c63ff, #48cfad);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255,255,255,0.88);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ===== HINTS ===== */
+    #hints {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .hint-chip {
+      background: rgba(108, 99, 255, 0.2);
+      border: 1px solid rgba(108, 99, 255, 0.35);
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hint-chip:hover {
+      background: rgba(108, 99, 255, 0.45);
+      color: #fff;
+    }
+
+    /* ===== INPUT ===== */
+    #inputBox {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 6px 6px 6px 12px;
+      transition: border 0.2s;
+    }
+
+    #inputBox:focus-within {
+      border-color: rgba(108, 99, 255, 0.6);
+    }
+
+    #prompt {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+    }
+
+    #prompt::placeholder { color: rgba(255,255,255,0.3); }
+
+    #btn {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #6c63ff, #48cfad);
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    #btn:hover { opacity: 0.85; transform: scale(1.05); }
+    #btn:active { transform: scale(0.95); }
+
+    /* ===== TOOLTIP LABEL ===== */
+    #scene-label {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(15,15,25,0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      padding: 8px 14px;
+      border-radius: 30px;
+      z-index: 10;
+      pointer-events: none;
+    }
+  </style>
 </head>
 
 <body>
 
+<!-- ===== CHAT SIDEBAR ===== -->
 <div id="chat">
-  <div id="messages"></div>
+  <div id="chat-header">
+    <div class="logo">🧊</div>
+    <div>
+      <h1>Text → 3D</h1>
+      <p>Describe an object to view it in 3D</p>
+    </div>
+  </div>
+
+  <div id="messages">
+    <div class="msg bot">👋 Hi! Describe any object below and I'll show it in 3D.</div>
+  </div>
+
+  <div id="hints">
+    <span class="hint-chip" onclick="sendHint('fox')">🦊 Fox</span>
+    <span class="hint-chip" onclick="sendHint('duck')">🦆 Duck</span>
+    <span class="hint-chip" onclick="sendHint('fish')">🐟 Fish</span>
+    <span class="hint-chip" onclick="sendHint('robot')">🤖 Robot</span>
+    <span class="hint-chip" onclick="sendHint('truck')">🚚 Truck</span>
+    <span class="hint-chip" onclick="sendHint('buggy')">🏎 Buggy</span>
+    <span class="hint-chip" onclick="sendHint('boombox')">🔊 Boombox</span>
+    <span class="hint-chip" onclick="sendHint('bottle')">💧 Bottle</span>
+    <span class="hint-chip" onclick="sendHint('helmet')">⛑ Helmet</span>
+    <span class="hint-chip" onclick="sendHint('lantern')">🏮 Lantern</span>
+    <span class="hint-chip" onclick="sendHint('camera')">📷 Camera</span>
+    <span class="hint-chip" onclick="sendHint('avocado')">🥑 Avocado</span>
+    <span class="hint-chip" onclick="sendHint('corset')">👗 Corset</span>
+    <span class="hint-chip" onclick="sendHint('scifi helmet')">🚀 Sci-Fi</span>
+    <span class="hint-chip" onclick="sendHint('toy car')">🚗 Toy Car</span>
+  </div>
+
   <div id="inputBox">
-    <input id="prompt" placeholder="Describe an object (human, chair, heart)">
-    <button id="btn">Send</button>
+    <input id="prompt" placeholder="e.g. show me a fox...">
+    <button id="btn">➤</button>
   </div>
 </div>
+
+<!-- ===== SCENE HINT ===== -->
+<div id="scene-label">🖱 Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
 
 <!-- THREE.JS -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -96,36 +267,85 @@ let scene, camera, renderer, controls, model;
 
 // ===== SCENE =====
 scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+
+// Warm light gradient background — makes dark models clearly visible
+const bgTop    = new THREE.Color(0xc9dcf0);   // soft sky blue
+const bgBottom = new THREE.Color(0xf0e8da);   // warm sand
+scene.background = bgTop;
 
 // ===== CAMERA =====
-camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 1.5, 4);
 
 // ===== RENDERER =====
 renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
 document.body.appendChild(renderer.domElement);
 
 // ===== CONTROLS =====
 controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.dampingFactor = 0.07;
+controls.minDistance = 0.5;
+controls.maxDistance = 20;
 
 // ===== LIGHTS =====
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(5,5,5);
-scene.add(light);
+// Hemisphere light: sky blue from top, warm from bottom
+const hemiLight = new THREE.HemisphereLight(0xc9dcf0, 0xf0e8da, 1.2);
+scene.add(hemiLight);
+
+// Main directional light (sun from top-right)
+const sunLight = new THREE.DirectionalLight(0xfff5e0, 2.0);
+sunLight.position.set(5, 8, 5);
+scene.add(sunLight);
+
+// Fill light from left
+const fillLight = new THREE.DirectionalLight(0xd0e8ff, 0.8);
+fillLight.position.set(-5, 2, -3);
+scene.add(fillLight);
+
+// Subtle rim light from behind
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+rimLight.position.set(0, -3, -5);
+scene.add(rimLight);
+
+// ===== GRADIENT SKY (painted on background) =====
+function drawGradientBackground() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2; canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  grad.addColorStop(0,   '#c9dcf0');
+  grad.addColorStop(0.5, '#dceaf5');
+  grad.addColorStop(1,   '#f0e8da');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 2, 512);
+  const tex = new THREE.CanvasTexture(canvas);
+  scene.background = tex;
+}
+drawGradientBackground();
+
+// ===== GROUND GRID =====
+const grid = new THREE.GridHelper(20, 30, 0xaabbcc, 0xccddee);
+grid.material.opacity = 0.35;
+grid.material.transparent = true;
+grid.position.y = -1.2;
+scene.add(grid);
 
 // ===== CENTER & SCALE =====
 function centerAndScaleModel(object) {
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
-
   object.position.sub(center);
-  const scale = 2 / Math.max(size.x, size.y, size.z);
+  const scale = 2.2 / Math.max(size.x, size.y, size.z);
   object.scale.setScalar(scale);
+  // Sit model on the ground grid
+  object.position.y += (size.y * scale) / 2 - 1.2;
 }
 
 // ===== CHAT HELPERS =====
@@ -137,38 +357,79 @@ function addMessage(text, cls) {
   div.innerText = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+  return div;
+}
+
+function removeLastBot() {
+  const bots = messages.querySelectorAll('.bot');
+  if (bots.length > 0) bots[bots.length - 1].remove();
+}
+
+// ===== HINT CHIPS =====
+function sendHint(text) {
+  document.getElementById('prompt').value = text;
+  document.getElementById('btn').click();
 }
 
 // ===== SEND MESSAGE =====
-document.getElementById("btn").onclick = () => {
-  const prompt = document.getElementById("prompt").value.trim();
-  if (!prompt) return;
+document.getElementById("btn").onclick = async () => {
+  const promptInput = document.getElementById("prompt");
+  const promptText = promptInput.value.trim();
+  if (!promptText) return;
 
-  addMessage(prompt, "user");
-  document.getElementById("prompt").value = "";
+  addMessage(promptText, "user");
+  promptInput.value = "";
+  addMessage("🔍 Thinking...", "bot");
 
-  addMessage("Loading 3D model...", "bot");
+  try {
+    // Step 1: Ask backend what model matches
+    const res = await fetch(`http://127.0.0.1:8000/generate?prompt=${encodeURIComponent(promptText)}`);
+    const data = await res.json();
 
-  if (model) scene.remove(model);
+    removeLastBot();
+    addMessage(data.reply, "bot");
 
-  const loader = new THREE.GLTFLoader();
-  const url = `http://127.0.0.1:8000/generate?prompt=${encodeURIComponent(prompt)}`;
+    // Step 2: If a model was matched, load the GLB
+    if (data.model) {
+      addMessage("⏳ Loading 3D model...", "bot");
 
-  loader.load(
-    url,
-    (gltf) => {
-      model = gltf.scene;
-      centerAndScaleModel(model);
-      scene.add(model);
-      addMessage("Here is the 3D model 👇", "bot");
-    },
-    undefined,
-    (err) => {
-      console.error(err);
-      addMessage("Model not found ❌", "bot");
+      if (model) {
+        scene.remove(model);
+        model = null;
+      }
+
+      const loader = new THREE.GLTFLoader();
+      const modelUrl = `http://127.0.0.1:8000/model/${data.model}`;
+
+      loader.load(
+        modelUrl,
+        (gltf) => {
+          model = gltf.scene;
+          centerAndScaleModel(model);
+          scene.add(model);
+          removeLastBot();
+          addMessage("✨ Here is your 3D model! Drag to rotate.", "bot");
+        },
+        undefined,
+        (err) => {
+          console.error(err);
+          removeLastBot();
+          addMessage("❌ Failed to load the 3D model.", "bot");
+        }
+      );
     }
-  );
+
+  } catch (err) {
+    console.error(err);
+    removeLastBot();
+    addMessage("❌ Could not connect to the backend. Is the server running?", "bot");
+  }
 };
+
+// ===== ENTER KEY =====
+document.getElementById("prompt").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("btn").click();
+});
 
 // ===== ANIMATE =====
 function animate() {
@@ -180,7 +441,7 @@ animate();
 
 // ===== RESIZE =====
 window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
@@ -188,14 +449,3 @@ window.addEventListener("resize", () => {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
