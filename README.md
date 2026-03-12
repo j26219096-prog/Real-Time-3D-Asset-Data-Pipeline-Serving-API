@@ -58,7 +58,8 @@ Try searching for the mapped keywords:
 - `show me a fox`
 - `vintage camera`
 - `robot`
+- `lamborghini`
+- `heart`
 - `sci-fi helmet`
-- `toy car`
 
 > **Note:** The first time an asset is requested, the backend performs a remote extraction (download). Subsequent requests hit the local cache layer instantly. Binary `.glb` files are intentionally excluded from version control via `.gitignore`.

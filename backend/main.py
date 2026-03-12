@@ -33,10 +33,15 @@ MODEL_MAP = {
         "remote_url": f"{_BASE}/Avocado/glTF-Binary/Avocado.glb",
         "description": "A detailed 3D avocado with realistic texture."
     },
-    "fox": {
-        "keywords": ["fox", "animal", "wolf", "dog", "canine", "wild animal", "creature"],
-        "remote_url": f"{_BASE}/Fox/glTF-Binary/Fox.glb",
-        "description": "A cute animated fox 3D model."
+    "lamborghini": {
+        "keywords": ["lamborghini", "lambo", "supercar", "sports car", "car"],
+        "remote_url": None,
+        "description": "A sleek Lamborghini supercar. (Note: Locally hosted model required)"
+    },
+    "bmw": {
+        "keywords": ["bmw", "car", "sedan", "vehicle", "auto"],
+        "remote_url": None,
+        "description": "A luxury BMW vehicle. (Note: Locally hosted model required)"
     },
     "helmet": {
         "keywords": ["helmet", "armor", "head gear", "battle", "warrior", "knight", "sci-fi", "damaged"],
@@ -83,20 +88,20 @@ MODEL_MAP = {
         "remote_url": f"{_BASE}/CesiumMan/glTF-Binary/CesiumMan.glb",
         "description": "A walking humanoid robot — animated Cesium Man."
     },
-    "buggy": {
-        "keywords": ["buggy", "off-road", "jeep", "dune buggy", "4x4", "race car"],
-        "remote_url": f"{_BASE}/Buggy/glTF-Binary/Buggy.glb",
-        "description": "A rugged off-road buggy vehicle model."
+    "heart": {
+        "keywords": ["heart", "cardiac", "organ", "cardiology", "medical"],
+        "remote_url": None,
+        "description": "A realistic human heart model. (Note: Locally hosted model required)"
     },
     "scifihelmet": {
         "keywords": ["sci fi helmet", "scifi", "space helmet", "futuristic", "astronaut", "space"],
         "remote_url": f"{_BASE}/SciFiHelmet/glTF-Binary/SciFiHelmet.glb",
         "description": "A futuristic sci-fi helmet with advanced PBR materials."
     },
-    "toy car": {
-        "keywords": ["toy car", "toy", "miniature", "small car", "model car", "racing"],
-        "remote_url": f"{_BASE}/ToyCar/glTF-Binary/ToyCar.glb",
-        "description": "A cute miniature toy car with shiny paint and realistic details."
+    "bike": {
+        "keywords": ["bike", "bicycle", "cycle", "motorcycle", "motorbike", "vehicle"],
+        "remote_url": None,
+        "description": "A highly detailed two-wheeler bike. (Note: Locally hosted model required)"
     }
 }
 
@@ -140,9 +145,9 @@ def generate_model(prompt: str):
         "model": None,
         "reply": (
             "❌ Sorry, I couldn't recognize that. Try:\n"
-            "duck, fox, fish, robot, truck, buggy, boombox,\n"
-            "bottle, helmet, lantern, camera, corset, avocado,\n"
-            "scifi helmet, or toy car."
+            "duck, lamborghini, bmw, fish, robot, truck, heart,\n"
+            "boombox, bottle, helmet, lantern, camera, corset,\n"
+            "avocado, scifi helmet, or bike."
         )
     }
 
@@ -176,7 +181,14 @@ def serve_model(model_name: str):
 
     # Fetch from remote URL and cache
     try:
-        remote_url = MODEL_MAP[model_name]["remote_url"]
+        remote_url = MODEL_MAP[model_name].get("remote_url")
+        if not remote_url:
+            with _lock:
+                _downloading.pop(model_name, None)
+            return JSONResponse({
+                "error": f"Model '{model_name}' must be uploaded manually by placing '{model_name}.glb' in the backend/models directory."
+            }, status_code=404)
+
         print(f"[INFO] Fetching {model_name} from: {remote_url}")
 
         response = requests.get(remote_url, timeout=60, stream=True)
