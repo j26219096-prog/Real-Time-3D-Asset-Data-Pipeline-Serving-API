@@ -12,6 +12,12 @@ env/
 models/*.glb
 backend/models/*.glb
 
+# Explicitly KEEP these manually uploaded models
+!models/lamborghini.glb
+!models/bmw.glb
+!models/bike.glb
+!models/heart.glb
+
 # OS files
 .DS_Store
 Thumbs.db

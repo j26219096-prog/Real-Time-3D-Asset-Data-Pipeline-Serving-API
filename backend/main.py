@@ -186,7 +186,7 @@ def serve_model(model_name: str):
             with _lock:
                 _downloading.pop(model_name, None)
             return JSONResponse({
-                "error": f"Model '{model_name}' must be uploaded manually by placing '{model_name}.glb' in the backend/models directory."
+                "error": f"Model '{model_name}' must be uploaded manually by placing '{model_name}.glb' in the 'models' directory at the root of the project."
             }, status_code=404)
 
         print(f"[INFO] Fetching {model_name} from: {remote_url}")
